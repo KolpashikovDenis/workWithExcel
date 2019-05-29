@@ -57,7 +57,7 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
             #data.append(space_to_tab(line).split('\t'))
             data = space_to_tab(line).split(('\t'))
             data.remove('all')
-            # TODO: чтение выхлапа sar, создание первой диаграммы
+
             # for i in range(1, len(data)+1):
             #     active_sheet.cell(row = _row, column = i).value = data[i - 1]
             active_sheet.cell(row = _row, column = 1).value = data[0]
@@ -67,9 +67,23 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
         else:
             continue
 
-    # Тут запишем использование памяти
+    # Тут запишем использование памяти, лист 'MEM'
+    active_sheet = wb_report[Items[2]]
+    while True:
+        line = rdfile.readline().strip()
+        if line in 'swpused':
+            break
 
-     # Здесь записываем длины очередей
+    _row = 1
+    while True:
+        line = rdfile.readline().strip()
+        if 'Average' in line:
+            break
+        data = space_to_tab(line).split('\t')
+
+
+    # Здесь записываем длины очередей лист 'CPU'
+    active_sheet = wb_report[Items[1]]
     while True:
         line = rdfile.readline().strip()
         if 'runq-sz' in line:
