@@ -71,8 +71,9 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
     active_sheet = wb_report[Items[2]]
     while True:
         line = rdfile.readline().strip()
-        if line in 'swpused':
+        if 'swpused' in line:
             break
+    rdfile.readline().strip()
 
     _row = 1
     while True:
@@ -80,7 +81,12 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
         if 'Average' in line:
             break
         data = space_to_tab(line).split('\t')
+        active_sheet.cell(row = _row, column = 1).value = data[0]
+        active_sheet.cell(row = _row, column = 2).value = data[3]
+        _row += 1
 
+
+    wb_report.save(f_name)
 
     # Здесь записываем длины очередей лист 'CPU'
     active_sheet = wb_report[Items[1]]
