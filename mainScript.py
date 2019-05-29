@@ -1,4 +1,6 @@
+from datetime import datetime
 from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
 
 def space_to_tab(line):
     c = []
@@ -19,11 +21,18 @@ def space_to_tab(line):
 
 
 #=========   MAIN CODE ===============================
-f_name = 'sar_mpgu_izh.csv'
+# Формируем имя файла
+f_name = "Report_%Y-%m-%d_%H-%M-%S"
+print(datetime.now().strptime())
 
 data = []
 book = Workbook()
 
+# делаем екселевский файл
+Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET']
+wb_report = Workbook()
+for item in Items:
+    wb_report.create_sheet(item)
 
 with open(f_name, 'r') as rdfile:
     while True:
@@ -37,7 +46,6 @@ with open(f_name, 'r') as rdfile:
         line = rdfile.readline().strip()
         if line == '':
             break
-
         if 'all' in line:
             data.append(space_to_tab(line).split('\t'))
             # TODO: чтение выхлапа sar, создание первой диаграммы
@@ -59,15 +67,3 @@ with open(f_name, 'r') as rdfile:
             continue
 
     print('----------------------------------------------------------------------------')
-
-    while True:
-        line = rdfile.readline().strip()
-        if line == '':
-            break
-        if 'all' in line:
-            data = space_to_tab(line).split('\t')
-            # TODO: чтение выхлапа sar, создание первой диаграммы
-            print(data)
-        else:
-            continue
-
