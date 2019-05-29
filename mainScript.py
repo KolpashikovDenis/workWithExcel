@@ -50,20 +50,41 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
     _row = 1
     while True:
         line = rdfile.readline().strip()
-        if (line == '') or ('Average' in line):
+        # if (line == '') or ('Average' in line):
+        if 'Average' in line:
             break
         if 'all' in line:
             #data.append(space_to_tab(line).split('\t'))
             data = space_to_tab(line).split(('\t'))
             data.remove('all')
             # TODO: чтение выхлапа sar, создание первой диаграммы
-            for i in range(1, len(data)+1):
-                active_sheet.cell(row = _row, column = i).value = data[i - 1]
+            # for i in range(1, len(data)+1):
+            #     active_sheet.cell(row = _row, column = i).value = data[i - 1]
+            active_sheet.cell(row = _row, column = 1).value = data[0]
+            active_sheet.cell(row = _row, column = 2).value = data[len(data)-1]
             _row += 1
 
         else:
             continue
 
+    # Тут запишем использование памяти
+
+     # Здесь записываем длины очередей
+    while True:
+        line = rdfile.readline().strip()
+        if 'runq-sz' in line:
+            break
+
+    _row = 1
+    while True:
+        line = rdfile.readline().strip()
+        if 'Average' in line:
+            break
+        data = space_to_tab(line).split('\t')
+        active_sheet.cell(row = _row, column = 3).value = data[1]
+        _row += 1
+
+    # Сейвимся на всякий случай. С ЗАГРУЗКОЙ ЦП И ОЧЕРЕДЯМИ УСЁ
     wb_report.save(f_name)
     print('----------------------------------------------------------------------------')
 
