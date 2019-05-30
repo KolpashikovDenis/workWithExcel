@@ -1,4 +1,4 @@
-Linux 2,6,32-358,6,2,el6,x86_64 (web3,pgu,mos,ru) 	06/08/14 	_x86_64_	(24 CPU)
+awaitLinux 2,6,32-358,6,2,el6,x86_64 (web3,pgu,mos,ru) 	06/08/14 	_x86_64_	(24 CPU)
 
 09:20:06        CPU      %usr     %nice      %sys   %iowait    %steal      %irq     %soft    %guest     %idle
 09:21:06        all      4,98      0,00      5,10      0,00      0,00      0,00      0,06      0,00     89,86
