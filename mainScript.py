@@ -22,7 +22,8 @@ def space_to_tab(line):
 
 #=========   MAIN CODE ===============================
 # Формируем имя файла
-f_name = 'Report_'+datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")+'.xlsx'
+#f_name = 'Report_'+datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")+'.xlsx'
+f_name = "Report.xlsx"
 
 data = []
 book = Workbook()
@@ -58,8 +59,6 @@ with open('sar_mpgu_izh.csv', 'r') as rdfile:
             data = space_to_tab(line).split(('\t'))
             data.remove('all')
 
-            # for i in range(1, len(data)+1):
-            #     active_sheet.cell(row = _row, column = i).value = data[i - 1]
             active_sheet.cell(row = _row, column = 1).value = data[0]
             active_sheet.cell(row = _row, column = 2).value = data[len(data)-1]
             _row += 1
