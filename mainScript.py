@@ -1,6 +1,4 @@
-from datetime import datetime
 from openpyxl import Workbook
-from openpyxl.writer.excel import save_workbook
 
 def space_to_tab(line):
     c = []
@@ -17,7 +15,6 @@ def space_to_tab(line):
 
     line = ''.join(c)
     return line
-
 
 
 #=========   MAIN CODE ===============================
@@ -146,6 +143,7 @@ with open(f_name_with_data, 'r') as infile:
             active_sheet.cell(row = 1, column = 6).value = data[5]
             break
 
+    # САМЫЙ ЖОПОШНЫЙ УЧАСТОК КОДА
     map = {}
     while True:
         line = infile.readline().strip()
@@ -153,15 +151,17 @@ with open(f_name_with_data, 'r') as infile:
             break
         data = space_to_tab(line).split('\t')
         del data[2:6]
-        key = data[1]
-        del data[1]
+        key = data[0]
+        del data[0:2]
         if key in map.keys():
-            for i in range(len(data)):
-                map[key][i].append(data[i])
+            map[key].append(data)
         else:
-            for i in range(len(data)):
-                map[key][i] = [data[i]]
-    print(map)
+            map[key] = [data]
+
+
+    for i in map['09:21:06']:
+        print(i)
+    print()
 
 wb_report.save(f_name_report)
 
