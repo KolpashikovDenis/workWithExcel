@@ -134,13 +134,12 @@ with open(f_name_with_data, 'r') as infile:
         line = infile.readline().strip()
         if 'DEV' in line:
             data = space_to_tab(line).split('\t')
-            del data[2:6]
+            del data[1:6]
             active_sheet.cell(row = 1, column = 1).value = data[0]
             active_sheet.cell(row = 1, column = 2).value = data[1]
             active_sheet.cell(row = 1, column = 3).value = data[2]
             active_sheet.cell(row = 1, column = 4).value = data[3]
             active_sheet.cell(row = 1, column = 5).value = data[4]
-            active_sheet.cell(row = 1, column = 6).value = data[5]
             break
 
     # САМЫЙ ЖОПОШНЫЙ УЧАСТОК КОДА
@@ -159,111 +158,34 @@ with open(f_name_with_data, 'r') as infile:
             map[key] = [data]
 
 
-    for i in map['09:21:06']:
-        print(i)
+    size = len(map['09:21:06'])
+    # _avgqu_sz = 0.0
+    # _await = 0.0
+    # _svctm = 0.0
+    # _util = 0.0
+    avg_map = {}
+    rowNum = 2
+    for key in map.keys():
+        _avgqu_sz = 0.0
+        _await = 0.0
+        _svctm = 0.0
+        _util = 0.0
+        for i in map[key]:
+            _avgqu_sz += float(i[0].replace(',', '.'))
+            _await += float(i[1].replace(',', '.'))
+            _svctm += float(i[2].replace(',', '.'))
+            _util += float(i[3].replace(',', '.'))
+
+        avg_map[key] = [_avgqu_sz / size, _await / size, _svctm / size, _util / size]
+        active_sheet.cell(row=rowNum, column=1).value = key
+        active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
+        active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
+        active_sheet.cell(row=rowNum, column=4).value = avg_map[key][2]
+        active_sheet.cell(row=rowNum, column=5).value = avg_map[key][3]
+        rowNum += 1
+
     print()
 
-wb_report.save(f_name_report)
+#
 
-    # # Пропустим первые две строки
-    # while True:
-    #     line = infile.readline().strip()
-    #     if line == '':
-    #         break
-    #
-    # # Заполняем страничку с данными по CPU
-    # active_sheet = wb_report[Items[1]]
-    #
-    # _row = 1
-    # while True:
-    #     line = infile.readline().strip()
-    #     # if (line == '') or ('Average' in line):
-    #     if 'Average' in line:
-    #         break
-    #     if 'all' in line:
-    #         #data.append(space_to_tab(line).split('\t'))
-    #         data = space_to_tab(line).split(('\t'))
-    #         data.remove('all')
-    #
-    #         active_sheet.cell(row = _row, column = 1).value = data[0]
-    #         active_sheet.cell(row = _row, column = 2).value = data[len(data)-1]
-    #         _row += 1
-    #
-    #     else:
-    #         continue
-    #
-    # #
-    #
-    # # Тут запишем использование памяти, лист 'MEM'
-    # active_sheet = wb_report[Items[2]]
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'memused' in line:
-    #         break
-    # infile.readline().strip()
-    #
-    # _row = 1
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'Average' in line:
-    #         break
-    #     data = space_to_tab(line).split('\t')
-    #     active_sheet.cell(row = _row, column = 1).value = data[0]
-    #     active_sheet.cell(row = _row, column = 2).value = data[3]
-    #     _row += 1
-    #
-    #
-    # active_sheet = wb_report[Items[2]]
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'swpused' in line:
-    #         break
-    # infile.readline().strip()
-    #
-    # _row = 1
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'Average' in line:
-    #         break
-    #     data = space_to_tab(line).split('\t')
-    #     active_sheet.cell(row = _row, column = 1).value = data[0]
-    #     active_sheet.cell(row = _row, column = 3).value = data[3]
-    #     _row += 1
-    #
-    #
-    # wb_report.save(f_name)
-    #
-    # # Здесь записываем длины очередей лист 'CPU'
-    # active_sheet = wb_report[Items[1]]
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'runq-sz' in line:
-    #         break
-    #
-    # _row = 1
-    # while True:
-    #     line = infile.readline().strip()
-    #     if 'Average' in line:
-    #         break
-    #     data = space_to_tab(line).split('\t')
-    #     active_sheet.cell(row = _row, column = 3).value = data[1]
-    #     _row += 1
-    #
-    # # Сейвимся на всякий случай. С ЗАГРУЗКОЙ ЦП И ОЧЕРЕДЯМИ УСЁ
-    # wb_report.save(f_name)
-    # print('----------------------------------------------------------------------------')
-    #
-    # active_sheet = wb_report[Items[2]]
-    #
-    # while True:
-    #     line = infile.readline().strip()
-    #     if line == '':
-    #         break
-    #     if 'all' in line:
-    #         data = space_to_tab(line).split('\t')
-    #         # TODO: чтение выхлапа sar, создание второй диаграммы
-    #         print(data)
-    #     else:
-    #         continue
-    #
-    # print('----------------------------------------------------------------------------')
+wb_report.save(f_name_report)
