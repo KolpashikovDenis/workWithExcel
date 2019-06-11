@@ -159,10 +159,6 @@ with open(f_name_with_data, 'r') as infile:
 
 
     size = len(map['09:21:06'])
-    # _avgqu_sz = 0.0
-    # _await = 0.0
-    # _svctm = 0.0
-    # _util = 0.0
     avg_map = {}
     rowNum = 2
     for key in map.keys():
@@ -186,6 +182,49 @@ with open(f_name_with_data, 'r') as infile:
 
     print()
 
-#
+# Усредненные данные по сетевым интерфейсам
+with open(f_name_with_data, 'r') as infile:
+    active_sheet = wb_report[Items[4]]
+    while True:
+        line = infile.readline().strip()
+        if 'IFACE' in line:
+            data = space_to_tab(line).split('\t')
+            del data[1:4]
+            del data[3:]
+            active_sheet.cell(row=1, column=1).value = data[0]
+            active_sheet.cell(row=1, column=2).value = data[1]
+            active_sheet.cell(row=1, column=3).value = data[2]
+            break
+
+    map = {}
+    while True:
+        line = infile.readline().strip()
+        if 'Average' in line:
+            break
+        data = space_to_tab(line).split('\t')
+        del data[1:4]
+        del data[3:]
+        key = data[0]
+        del data[0]
+        if key in map.keys():
+            map[key].append(data)
+        else:
+            map[key] = [data]
+
+    size = len(map['09:21:06'])
+    avg_map = {}
+    rowNum = 2
+    for key in map.keys():
+        rxkB = 0.0
+        txkB = 0.0
+        for i in map[key]:
+            rxkB += float(i[0].replace(',', '.'))
+            txkB += float(i[1].replace(',', '.'))
+        avg_map[key] = [rxkB/size, txkB/size]
+        active_sheet.cell(row=rowNum, column=1).value = key
+        active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
+        active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
+        rowNum += 1
+
 
 wb_report.save(f_name_report)
