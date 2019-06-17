@@ -1,5 +1,8 @@
 from openpyxl import Workbook, load_workbook
+from matplotlib import pyplot as plt
 import os
+import numpy as np
+
 
 def space_to_tab(line):
     c = []
@@ -25,6 +28,7 @@ f_name_report = "Report.xlsx"
 f_name_with_data = "sar_mpgu_izh.csv"
 
 data = []
+cpu = []
 
 # делаем екселевский файл
 Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET', 'LOAD_AVG']
@@ -48,6 +52,7 @@ line = str('')
 # Данные для CPU
 with open(f_name_with_data, 'r') as infile:
     active_sheet = wb_report[Items[1]]
+    # Утилизация CPU, idle в %
     while True:
         line = infile.readline().strip()
         if '%idle' in line:
@@ -68,7 +73,7 @@ with open(f_name_with_data, 'r') as infile:
             active_sheet.cell(row = r, column = 1).value = data[0]
             active_sheet.cell(row = r, column = 2).value = data[1]
             r += 1
-
+    # очереди CPU
     while True:
         line = infile.readline().strip()
         if 'runq-sz' in line:
