@@ -25,13 +25,10 @@ f_name_report = "Report.xlsx"
 f_name_with_data = "sar_mpgu_izh.csv"
 
 data = []
-# CPU = []
-# MEM = []
-# #DISK = [] ------ ????????
-# NET = [] # ??????
 
 # делаем екселевский файл
 Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET', 'LOAD_AVG']
+
 if os.path.exists(f_name_report):
     wb_report = load_workbook(f_name_report)
     for i in range(1, len(Items)):
