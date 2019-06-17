@@ -226,5 +226,4 @@ with open(f_name_with_data, 'r') as infile:
         active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
         rowNum += 1
 
-
 wb_report.save(f_name_report)
