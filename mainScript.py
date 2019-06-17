@@ -29,6 +29,7 @@ f_name_with_data = "sar_mpgu_izh.csv"
 
 data = []
 cpu = []
+q_cpu = []
 
 # делаем екселевский файл
 Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET', 'LOAD_AVG']
@@ -71,8 +72,11 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:10]
             active_sheet.cell(row = r, column = 1).value = data[0]
-            active_sheet.cell(row = r, column = 2).value = data[1]
+            active_sheet.cell(row = r, column = 2).value = float(data[1].replace(',', '.'))
+            cpu.append(float(data[1].replace(',', '.')))
             r += 1
+
+
     # очереди CPU
     while True:
         line = infile.readline().strip()
@@ -89,7 +93,7 @@ with open(f_name_with_data, 'r') as infile:
             break
         data = space_to_tab(line).split('\t')
         del data[2:]
-        active_sheet.cell(row = r, column = 3).value = data[1]
+        active_sheet.cell(row = r, column = 3).value = float(data[1].replace(',', '.'))
         r += 1
 
 # Данные для МЕМ
@@ -114,7 +118,7 @@ with open(f_name_with_data, 'r') as infile:
         del data[1:3]
         del data[2:]
         active_sheet.cell(row = r, column = 1).value = data[0]
-        active_sheet.cell(row = r, column = 2).value = data[1]
+        active_sheet.cell(row = r, column = 2).value = float(data[1].replace(',', '.'))
         r += 1
 
     while True:
@@ -134,7 +138,7 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[1:3]
         del data[2:]
-        active_sheet.cell(row=r, column=3).value = data[1]
+        active_sheet.cell(row=r, column=3).value = float(data[1].replace(',', '.'))
         r += 1
 
 # Данные для среднего времени чтения/записи
@@ -189,8 +193,6 @@ with open(f_name_with_data, 'r') as infile:
         active_sheet.cell(row=rowNum, column=4).value = avg_map[key][2]
         active_sheet.cell(row=rowNum, column=5).value = avg_map[key][3]
         rowNum += 1
-
-    print()
 
 # Усредненные данные по сетевым интерфейсам
 with open(f_name_with_data, 'r') as infile:
@@ -258,9 +260,9 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[1:3]
         active_sheet.cell(row=r, column=1).value = data[0]
-        active_sheet.cell(row=r, column=2).value = data[1]
-        active_sheet.cell(row=r, column=3).value = data[2]
-        active_sheet.cell(row=r, column=4).value = data[3]
+        active_sheet.cell(row=r, column=2).value = float(data[1].replace(',', '.'))
+        active_sheet.cell(row=r, column=3).value = float(data[2].replace(',', '.'))
+        active_sheet.cell(row=r, column=4).value = float(data[3].replace(',', '.'))
         r += 1
 
 wb_report.save(f_name_report)
