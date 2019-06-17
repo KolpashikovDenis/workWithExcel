@@ -1,4 +1,5 @@
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
+import os
 
 def space_to_tab(line):
     c = []
@@ -30,12 +31,19 @@ data = []
 # NET = [] # ??????
 
 # делаем екселевский файл
-Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET']
-wb_report = Workbook()
-for item in Items:
-    wb_report.create_sheet(item)
-wdel = wb_report['Sheet']
-wb_report.remove(wdel)
+Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET', 'LOAD_AVG']
+if os.path.exists(f_name_report):
+    wb_report = load_workbook(f_name_report)
+    for i in range(1, len(Items)):
+        tmp_sheet = wb_report[Items[i]]
+        wb_report.remove(tmp_sheet)
+else:
+    wb_report = Workbook()
+    for item in Items:
+        wb_report.create_sheet(item)
+    wdel = wb_report['Sheet']
+    wb_report.remove(wdel)
+
 wb_report.save(f_name_report)
 
 line = str('')
@@ -226,4 +234,33 @@ with open(f_name_with_data, 'r') as infile:
         active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
         rowNum += 1
 
+# Динамика Load Average
+with open(f_name_with_data, 'r') as infile:
+    active_sheet = wb_report[Items[5]]
+    while True:
+        line = infile.readline().strip()
+        if 'runq-sz' in line:
+            data = space_to_tab(line).split('\t')
+            del data[1:3]
+            active_sheet.cell(row = 1, column = 1).value = data[0]
+            active_sheet.cell(row = 1, column = 2).value = data[1]
+            active_sheet.cell(row = 1, column = 3).value = data[2]
+            active_sheet.cell(row = 1, column = 4).value = data[3]
+            break
+
+    r = 2
+    while True:
+        line = infile.readline().strip()
+        if 'Average' in line:
+            break
+        data = space_to_tab(line).split('\t')
+        del data[1:3]
+        active_sheet.cell(row=r, column=1).value = data[0]
+        active_sheet.cell(row=r, column=2).value = data[1]
+        active_sheet.cell(row=r, column=3).value = data[2]
+        active_sheet.cell(row=r, column=4).value = data[3]
+        r += 1
+
 wb_report.save(f_name_report)
+
+#Начинаем рисовать
