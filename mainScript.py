@@ -20,38 +20,101 @@ def space_to_tab(line):
     line = ''.join(c)
     return line
 
-def show_util_cpu(t, cpu, qcpu):
+
+def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm, p_util, p_net_rx, p_net_tx, p_avg1, p_avg5, p_avg15):
     np_x = np.asarray(t)
-    np_y1 = np.asarray(cpu)
-    np_y2 = np.asarray(q_cpu)
+    cpu_y1 = np.asarray(cpu)
+    qcpu_y2 = np.asarray(qcpu)
 
-    fig, ax = plt.subplots()
-    ax.plot(np_x, np_y1, color='blue', label='Утилизация CPU')
-    ax.plot(np_x, np_y2, color='green', label='Очередь CPU')
-    ax.set_xlabel('Продолжительность теста, ч:мм')
-    ax.set_ylabel('Утилизация CPU, %')
-    ax.set_title('Утилизация CPU')
-    plt.legend(loc='upper left')
-    ylim = ax.get_ylim()
+    memsused_y = np.asarray(p_memused)
+    swpused_y = np.asarray(p_swpused)
+    avgqu_sz_y = np.asarray(p_avgqu_sz)
+    await_y = np.asarray(p_await)
+    svctm_y = np.asarray(p_svctm)
+    util_y = np.asarray(p_util)
+    net_rx_y = np.asarray(p_net_rx)
+    net_tx_y = np.asarray(p_net_tx)
+    avg1_y = np.asarray(p_avg1)
+    avg5_y = np.asarray(p_avg5)
+    avg15_y= np.asarray(p_avg15)
 
-    sub_ax = ax.twinx()
+
+    fig, ax = plt.subplots(nrows=3, ncols=2)
+
+    ax[0][0].plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
+    ax[0][0].plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
+    ax[0][0].set_xlabel('Продолжительность теста, ч:мм')
+    ax[0][0].set_ylabel('Утилизация CPU, %')
+    ax[0][0].set_title('Утилизация CPU')
+    ax[0][0].legend(loc='upper left')
+    # plt.legend(loc='upper left')
+    ylim = ax[0][0].get_ylim()
+    sub_ax = ax[0][0].twinx()
     sub_ax.plot([], [])
     sub_ax.set_ylabel('Очереди CPU, шт')
     sub_ax.set_ylim(ylim[0], ylim[1])
     plt.grid()
 
+
+    ax[0][1].plot(np_x, memsused_y, color='blue', label='Утилизация памяти')
+    ax[0][1].plot(np_x, swpused_y, color='green', label='Утилизация подкачки')
+    ax[0][1].set_xlabel('Продолжительность теста, ч:мм')
+    ax[0][1].set_ylabel('Утилизация памяти, %')
+    ax[0][1].set_title('Утилизация памяти')
+    ax[0][0].legend(loc='upper left')
+    # plt.legend(loc='upper left')
+    ylim = ax[0][1].get_ylim()
+    sub_ax = ax[0][1].twinx()
+    sub_ax.plot([], [])
+    sub_ax.set_ylabel('Утилизация подкачки, %')
+    sub_ax.set_ylim(ylim[0], ylim[1])
+    plt.grid()
+
+    ax[1][0].plot(np_x, avgqu_sz_y, color='blue', label='Очередь дисковой подсистемы')
+    ax[1][0].set_xlabel('Продолжительность теста, ч:мм')
+    ax[1][0].set_ylabel('Очередь дисковой подсистемы, шт')
+    ax[1][0].set_title('Очередь дисковой подсистемы')
+    ax[0][0].legend(loc='upper left')
+    # plt.legend(loc='upper left')
+    plt.grid()
+
+    plt.legend(loc='upper left')
     plt.show()
 
 
-#=========   MAIN CODE ===============================
+# =========   MAIN CODE ===============================
 # Формируем имя файла
-#f_name = 'Report_'+datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")+'.xlsx'
+# f_name = 'Report_'+datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")+'.xlsx'
 f_name_report = "Report.xlsx"
 f_name_with_data = "sar_mpgu_izh.csv"
 
+# Вспомогательный список
 data = []
+
+# Данные для графика утилизации CPU
 cpu = []
 q_cpu = []
+
+# Списки для хранения данных по использованию оперативки и свопа
+memsused = []
+swpused = []
+
+# Списки в которых хранятся устредненные данные по использованию дисков
+l_avgqu_sz = []
+l_await = []
+l_svctm = []
+l_util = []
+
+# В этом списке содержатся усредненные данные по использованию сетевых интерфейсов
+net_rx = []
+net_tx = []
+
+# список для Load Average
+ld_avg_1 = []
+ld_avg_5 = []
+ld_avg_15 = []
+
+# список для хранения времени
 t = []
 
 # делаем екселевский файл
@@ -69,7 +132,7 @@ else:
     wdel = wb_report['Sheet']
     wb_report.remove(wdel)
 
-wb_report.save(f_name_report)
+# wb_report.save(f_name_report)
 
 line = str('')
 
@@ -83,8 +146,8 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:10]
             data[0] = data[0][:5]
-            active_sheet.cell(row = 1, column = 1).value = data[0]
-            active_sheet.cell(row = 1, column = 2).value = data[1]
+            active_sheet.cell(row=1, column=1).value = data[0]
+            active_sheet.cell(row=1, column=2).value = data[1]
             break
 
     r = 2
@@ -96,10 +159,10 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:10]
             data[0] = data[0][:5]
-            active_sheet.cell(row = r, column = 1).value = data[0]
+            active_sheet.cell(row=r, column=1).value = data[0]
             t.append(data[0])
             a = 100.0 - float(data[1].replace(',', '.'))
-            active_sheet.cell(row = r, column = 2).value = a
+            active_sheet.cell(row=r, column=2).value = a
             cpu.append(a)
             r += 1
 
@@ -109,7 +172,7 @@ with open(f_name_with_data, 'r') as infile:
         if 'runq-sz' in line:
             data = space_to_tab(line).split('\t')
             del data[2:]
-            active_sheet.cell(row = 1, column = 3).value = data[1]
+            active_sheet.cell(row=1, column=3).value = data[1]
             break
 
     r = 2
@@ -120,12 +183,9 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[2:]
         a = float(data[1].replace(',', '.'))
-        active_sheet.cell(row = r, column = 3).value = a
+        active_sheet.cell(row=r, column=3).value = a
         q_cpu.append(a)
         r += 1
-
-#Рисуем график 'Утилизация CPU' и 'Очереди CPU'
-show_util_cpu(t, cpu, q_cpu)
 
 # Данные для МЕМ
 with open(f_name_with_data, 'r') as infile:
@@ -137,8 +197,8 @@ with open(f_name_with_data, 'r') as infile:
             del data[1:3]
             del data[2:]
             data[0] = data[0][:5]
-            active_sheet.cell(row = 1, column = 1).value = data[0]
-            active_sheet.cell(row = 1, column = 2).value = data[1]
+            active_sheet.cell(row=1, column=1).value = data[0]
+            active_sheet.cell(row=1, column=2).value = data[1]
             break
 
     r = 2
@@ -150,8 +210,10 @@ with open(f_name_with_data, 'r') as infile:
         del data[1:3]
         del data[2:]
         data[0] = data[0][:5]
-        active_sheet.cell(row = r, column = 1).value = data[0]
-        active_sheet.cell(row = r, column = 2).value = float(data[1].replace(',', '.'))
+        active_sheet.cell(row=r, column=1).value = data[0]
+        a = float(data[1].replace(',', '.'))
+        active_sheet.cell(row=r, column=2).value = a
+        memsused.append(a)
         r += 1
 
     while True:
@@ -171,7 +233,9 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[1:3]
         del data[2:]
-        active_sheet.cell(row=r, column=3).value = float(data[1].replace(',', '.'))
+        a = float(data[1].replace(',', '.'))
+        active_sheet.cell(row=r, column=3).value = a
+        swpused.append(a)
         r += 1
 
 # Данные для среднего времени чтения/записи
@@ -183,11 +247,11 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:6]
             data[0] = data[0][:5]
-            active_sheet.cell(row = 1, column = 1).value = data[0]
-            active_sheet.cell(row = 1, column = 2).value = data[1]
-            active_sheet.cell(row = 1, column = 3).value = data[2]
-            active_sheet.cell(row = 1, column = 4).value = data[3]
-            active_sheet.cell(row = 1, column = 5).value = data[4]
+            active_sheet.cell(row=1, column=1).value = data[0]
+            active_sheet.cell(row=1, column=2).value = data[1]
+            active_sheet.cell(row=1, column=3).value = data[2]
+            active_sheet.cell(row=1, column=4).value = data[3]
+            active_sheet.cell(row=1, column=5).value = data[4]
             break
 
     # САМЫЙ ЖОПОШНЫЙ УЧАСТОК КОДА
@@ -206,7 +270,6 @@ with open(f_name_with_data, 'r') as infile:
         else:
             map[key] = [data]
 
-
     size = len(map['09:21'])
     avg_map = {}
     rowNum = 2
@@ -220,6 +283,11 @@ with open(f_name_with_data, 'r') as infile:
             _await += float(i[1].replace(',', '.'))
             _svctm += float(i[2].replace(',', '.'))
             _util += float(i[3].replace(',', '.'))
+
+        l_avgqu_sz.append(_avgqu_sz / size)
+        l_await.append(_await / size)
+        l_svctm.append(_svctm / size)
+        l_util.append(_util / size)
 
         avg_map[key] = [_avgqu_sz / size, _await / size, _svctm / size, _util / size]
         active_sheet.cell(row=rowNum, column=1).value = key
@@ -269,7 +337,11 @@ with open(f_name_with_data, 'r') as infile:
         for i in map[key]:
             rxkB += float(i[0].replace(',', '.'))
             txkB += float(i[1].replace(',', '.'))
-        avg_map[key] = [rxkB/size, txkB/size]
+
+        net_rx.append(rxkB / size)
+        net_tx.append(txkB / size)
+
+        avg_map[key] = [rxkB / size, txkB / size]
         active_sheet.cell(row=rowNum, column=1).value = key
         active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
         active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
@@ -284,10 +356,10 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:3]
             data[0] = data[0][:5]
-            active_sheet.cell(row = 1, column = 1).value = data[0]
-            active_sheet.cell(row = 1, column = 2).value = data[1]
-            active_sheet.cell(row = 1, column = 3).value = data[2]
-            active_sheet.cell(row = 1, column = 4).value = data[3]
+            active_sheet.cell(row=1, column=1).value = data[0]
+            active_sheet.cell(row=1, column=2).value = data[1]
+            active_sheet.cell(row=1, column=3).value = data[2]
+            active_sheet.cell(row=1, column=4).value = data[3]
             break
 
     r = 2
@@ -298,12 +370,19 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[1:3]
         data[0] = data[0][:5]
+
         active_sheet.cell(row=r, column=1).value = data[0]
         active_sheet.cell(row=r, column=2).value = float(data[1].replace(',', '.'))
         active_sheet.cell(row=r, column=3).value = float(data[2].replace(',', '.'))
         active_sheet.cell(row=r, column=4).value = float(data[3].replace(',', '.'))
+        ld_avg_1.append(float(data[1].replace(',', '.')))
+        ld_avg_5.append(float(data[2].replace(',', '.')))
+        ld_avg_15.append(float(data[3].replace(',', '.')))
         r += 1
+
+# Рисуем график 'Утилизация CPU' и 'Очереди CPU'
+show_graphs(t, cpu, q_cpu, memsused, swpused, l_avgqu_sz, l_await, l_svctm, l_util, net_rx, net_tx, ld_avg_1, ld_avg_5, ld_avg_15)
 
 wb_report.save(f_name_report)
 
-#Начинаем рисовать
+# Начинаем рисовать
