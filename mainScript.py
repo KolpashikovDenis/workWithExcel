@@ -28,7 +28,9 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
 
     memsused_y = np.asarray(p_memused)
     swpused_y = np.asarray(p_swpused)
+
     avgqu_sz_y = np.asarray(p_avgqu_sz)
+
     await_y = np.asarray(p_await)
     svctm_y = np.asarray(p_svctm)
     util_y = np.asarray(p_util)
@@ -38,47 +40,48 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     avg5_y = np.asarray(p_avg5)
     avg15_y= np.asarray(p_avg15)
 
+    fig=plt.figure(figsize=(10, 7))
 
-    fig, ax = plt.subplots(nrows=3, ncols=2)
+    ax00 = fig.add_subplot(3, 2, 1)
 
-    ax[0][0].plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
-    ax[0][0].plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
-    ax[0][0].set_xlabel('Продолжительность теста, ч:мм')
-    ax[0][0].set_ylabel('Утилизация CPU, %')
-    ax[0][0].set_title('Утилизация CPU')
-    ax[0][0].legend(loc='upper left')
-    # plt.legend(loc='upper left')
-    ylim = ax[0][0].get_ylim()
-    sub_ax = ax[0][0].twinx()
-    sub_ax.plot([], [])
-    sub_ax.set_ylabel('Очереди CPU, шт')
-    sub_ax.set_ylim(ylim[0], ylim[1])
-    plt.grid()
-
-
-    ax[0][1].plot(np_x, memsused_y, color='blue', label='Утилизация памяти')
-    ax[0][1].plot(np_x, swpused_y, color='green', label='Утилизация подкачки')
-    ax[0][1].set_xlabel('Продолжительность теста, ч:мм')
-    ax[0][1].set_ylabel('Утилизация памяти, %')
-    ax[0][1].set_title('Утилизация памяти')
-    ax[0][0].legend(loc='upper left')
-    # plt.legend(loc='upper left')
-    ylim = ax[0][1].get_ylim()
-    sub_ax = ax[0][1].twinx()
-    sub_ax.plot([], [])
-    sub_ax.set_ylabel('Утилизация подкачки, %')
-    sub_ax.set_ylim(ylim[0], ylim[1])
-    plt.grid()
-
-    ax[1][0].plot(np_x, avgqu_sz_y, color='blue', label='Очередь дисковой подсистемы')
-    ax[1][0].set_xlabel('Продолжительность теста, ч:мм')
-    ax[1][0].set_ylabel('Очередь дисковой подсистемы, шт')
-    ax[1][0].set_title('Очередь дисковой подсистемы')
-    ax[0][0].legend(loc='upper left')
-    # plt.legend(loc='upper left')
-    plt.grid()
-
+    ax00.plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
+    ax00.plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
+    ax00.set_xlabel('Продолжительность теста, ч:мм')
+    ax00.set_ylabel('Утилизация CPU, %')
+    ax00.set_title('Утилизация CPU')
     plt.legend(loc='upper left')
+    ylim = ax00.get_ylim()
+    sub_ax00 = ax00.twinx()
+    sub_ax00.plot([], [])
+    sub_ax00.set_ylabel('Очереди CPU, шт')
+    sub_ax00.set_ylim(ylim[0], ylim[1])
+    plt.grid()
+
+    ax01=fig.add_subplot(3, 2, 2)
+    ax01.plot(np_x, memsused_y, color='blue', label='Утилизация памяти')
+    ax01.plot([], [], color='green', label='Утилизация подкачки')
+    ax01.set_xlabel('Продолжительность теста, ч:мм')
+    ax01.set_ylabel('Утилизация памяти, %')
+    ax01.set_title('Утилизация памяти')
+    plt.legend(loc='upper left')
+    ylim = ax01.get_ylim()
+    sub_ax01 = ax01.twinx()
+    sub_ax01.plot(np_x, swpused_y)
+    sub_ax01.set_ylabel('Утилизация подкачки, %')
+    # sub_ax01.set_ylim(ylim[0], ylim[1])
+    plt.grid()
+
+    ax10=fig.add_subplot(3, 2, 3)
+    ax10.plot(np_x, avgqu_sz_y, color='blue', label='Очередь дисковой подсистемы')
+    ax10.set_xlabel('Продолжительность теста, ч:мм')
+    ax10.set_ylabel('Очередь дисковой подсистемы, шт')
+    ax10.set_title('Очередь дисковой подсистемы')
+    plt.legend(loc='upper left')
+    plt.grid()
+
+
+
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
     plt.show()
 
 
@@ -119,20 +122,25 @@ t = []
 
 # делаем екселевский файл
 Items = ['Graphs', 'CPU', 'MEM', 'DISK', 'NET', 'LOAD_AVG']
+#
+# if os.path.exists(f_name_report):
+#     wb_report = load_workbook(f_name_report)
+#     for i in range(1, len(Items)):
+#         tmp_sheet = wb_report[Items[i]]
+#         wb_report.remove(tmp_sheet)
+# else:
+#     wb_report = Workbook()
+#     for item in Items:
+#         wb_report.create_sheet(item)
+#     wdel = wb_report['Sheet']
+#     wb_report.remove(wdel)
+wb_report = Workbook()
+for item in Items:
+    wb_report.create_sheet(item)
+wdel = wb_report['Sheet']
+wb_report.remove(wdel)
 
-if os.path.exists(f_name_report):
-    wb_report = load_workbook(f_name_report)
-    for i in range(1, len(Items)):
-        tmp_sheet = wb_report[Items[i]]
-        wb_report.remove(tmp_sheet)
-else:
-    wb_report = Workbook()
-    for item in Items:
-        wb_report.create_sheet(item)
-    wdel = wb_report['Sheet']
-    wb_report.remove(wdel)
 
-# wb_report.save(f_name_report)
 
 line = str('')
 
