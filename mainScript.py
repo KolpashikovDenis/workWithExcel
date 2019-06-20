@@ -23,13 +23,14 @@ def space_to_tab(line):
 
 def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm, p_util, p_net_rx, p_net_tx, p_avg1, p_avg5, p_avg15):
     np_x = np.asarray(t)
+    #CPU
     cpu_y1 = np.asarray(cpu)
     qcpu_y2 = np.asarray(qcpu)
-
+    #LoadAverage
     avg1_y = np.asarray(p_avg1)
     avg5_y = np.asarray(p_avg5)
     avg15_y= np.asarray(p_avg15)
-
+    # mem and SWop USED
     memsused_y = np.asarray(p_memused)
     swpused_y = np.asarray(p_swpused)
 
@@ -37,7 +38,9 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
 
     await_y = np.asarray(p_await)
     svctm_y = np.asarray(p_svctm)
+
     util_y = np.asarray(p_util)
+
     net_rx_y = np.asarray(p_net_rx)
     net_tx_y = np.asarray(p_net_tx)
 
@@ -91,7 +94,17 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     plt.legend(loc='upper left')
     plt.grid()
 
+    # Среднее время чтения и записи
     ax20=fig.add_subplot(3, 2, 5)
+    ax20.plot(np_x, await_y, color='blue', label='среднее время выполнения чтения/записи')
+    ax20.plot(np_x, svctm_y, color='green', label='среднее время обслуживания чтения/записи')
+    ax20.set_xlabel('Продолжительность теста, ч:мм')
+    ax20.set_ylabel('Среднее время\nчтения/записи')
+    ax20.set_title('Среднее время чтения/записи')
+    plt.legend(loc='upper left')
+    plt.grid()
+
+    # Утилизация сетевого интерфейса
 
 
     plt.subplots_adjust(wspace=0.3, hspace=0.5)
