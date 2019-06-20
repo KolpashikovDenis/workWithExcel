@@ -26,6 +26,10 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     cpu_y1 = np.asarray(cpu)
     qcpu_y2 = np.asarray(qcpu)
 
+    avg1_y = np.asarray(p_avg1)
+    avg5_y = np.asarray(p_avg5)
+    avg15_y= np.asarray(p_avg15)
+
     memsused_y = np.asarray(p_memused)
     swpused_y = np.asarray(p_swpused)
 
@@ -36,14 +40,11 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     util_y = np.asarray(p_util)
     net_rx_y = np.asarray(p_net_rx)
     net_tx_y = np.asarray(p_net_tx)
-    avg1_y = np.asarray(p_avg1)
-    avg5_y = np.asarray(p_avg5)
-    avg15_y= np.asarray(p_avg15)
 
     fig=plt.figure(figsize=(10, 7))
 
+    # Утилизация CPU
     ax00 = fig.add_subplot(3, 2, 1)
-
     ax00.plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
     ax00.plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
     ax00.set_xlabel('Продолжительность теста, ч:мм')
@@ -57,6 +58,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     sub_ax00.set_ylim(ylim[0], ylim[1])
     plt.grid()
 
+    # Утилизация памяти и файла подкачки
     ax01=fig.add_subplot(3, 2, 2)
     ax01.plot(np_x, memsused_y, color='blue', label='Утилизация памяти')
     ax01.plot([], [], color='green', label='Утилизация подкачки')
@@ -64,13 +66,12 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax01.set_ylabel('Утилизация памяти, %')
     ax01.set_title('Утилизация памяти')
     plt.legend(loc='upper left')
-    ylim = ax01.get_ylim()
     sub_ax01 = ax01.twinx()
     sub_ax01.plot(np_x, swpused_y)
     sub_ax01.set_ylabel('Утилизация подкачки, %')
-    # sub_ax01.set_ylim(ylim[0], ylim[1])
     plt.grid()
 
+    # очередь дисковой подсистемы
     ax10=fig.add_subplot(3, 2, 3)
     ax10.plot(np_x, avgqu_sz_y, color='blue', label='Очередь дисковой подсистемы')
     ax10.set_xlabel('Продолжительность теста, ч:мм')
@@ -79,6 +80,18 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     plt.legend(loc='upper left')
     plt.grid()
 
+    # Load Average
+    ax11=fig.add_subplot(3, 2, 4)
+    ax11.plot(np_x, avg1_y, color='blue', label='за 1 минуту')
+    ax11.plot(np_x, avg5_y, color='green', label='за 5 минут')
+    ax11.plot(np_x, avg15_y, color='purple', label='за 15 минут')
+    ax11.set_xlabel('Продолжительность теста, ч:мм')
+    ax11.set_ylabel('Значение коэффициента')
+    ax11.set_title('Load Average')
+    plt.legend(loc='upper left')
+    plt.grid()
+
+    ax20=fig.add_subplot(3, 2, 5)
 
 
     plt.subplots_adjust(wspace=0.3, hspace=0.5)
