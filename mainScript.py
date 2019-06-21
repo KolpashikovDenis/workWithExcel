@@ -1,8 +1,8 @@
 from openpyxl import Workbook, load_workbook
 from matplotlib import pyplot as plt
+from matplotlib import ticker
 import os
 import numpy as np
-
 
 def space_to_tab(line):
     c = []
@@ -19,7 +19,6 @@ def space_to_tab(line):
 
     line = ''.join(c)
     return line
-
 
 def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm, p_util, p_net_rx, p_net_tx, p_avg1, p_avg5, p_avg15):
     np_x = np.asarray(t)
@@ -59,6 +58,8 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax00.set_xlabel('Продолжительность теста, ч:мм')
     ax00.set_ylabel('Утилизация CPU, %')
     ax00.set_title('Утилизация CPU')
+    ax00.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax00.tick_params(labelsize=6, labelrotation=90)
     plt.legend(loc='upper left')
     ylim = ax00.get_ylim()
     sub_ax00 = ax00.twinx()
@@ -74,10 +75,15 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax01.set_xlabel('Продолжительность теста, ч:мм')
     ax01.set_ylabel('Утилизация памяти, %')
     ax01.set_title('Утилизация памяти')
+    ax01.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax01.tick_params(labelsize=6, labelrotation=90)
     plt.legend(loc='upper left')
     sub_ax01 = ax01.twinx()
     sub_ax01.plot(np_x, swpused_y)
     sub_ax01.set_ylabel('Утилизация подкачки, %')
+    sub_ax01.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    sub_ax01.tick_params(labelsize=6, labelrotation=90)
+
     plt.grid()
 
     # очередь дисковой подсистемы
@@ -86,6 +92,8 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax10.set_xlabel('Продолжительность теста, ч:мм')
     ax10.set_ylabel('Очередь дисковой подсистемы, шт')
     ax10.set_title('Очередь дисковой подсистемы')
+    ax10.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax10.tick_params(labelsize=6, labelrotation=90)
     plt.legend(loc='upper left')
     plt.grid()
 
@@ -97,6 +105,8 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax11.set_xlabel('Продолжительность теста, ч:мм')
     ax11.set_ylabel('Значение коэффициента')
     ax11.set_title('Load Average')
+    ax11.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax11.tick_params(labelsize=6, labelrotation=90)
     plt.legend(loc='upper left')
     plt.grid()
 
@@ -107,13 +117,22 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax20.set_xlabel('Продолжительность теста, ч:мм')
     ax20.set_ylabel('Среднее время\nчтения/записи')
     ax20.set_title('Среднее время чтения/записи')
+    ax20.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax20.tick_params(labelsize=6, labelrotation=90)
     plt.legend(loc='upper left')
     plt.grid()
 
-    #
-
     # Утилизация сетевого интерфейса
-
+    ax21=fig.add_subplot(3, 2, 6)
+    ax21.plot(np_x, net_rx_y, color='blue', label='Получаемые данные')
+    ax21.plot(np_x, net_tx_y, color='green', label='Передаваемые данные')
+    ax21.set_xlabel('Продолжительность теста, ч:мм')
+    ax21.set_ylabel('Передаваемые данные')
+    ax21.set_title('Утилизация сетевого интерфейса')
+    ax21.xaxis.set_major_locator(ticker.MultipleLocator(5))
+    ax21.tick_params(labelsize=6, labelrotation=90)
+    plt.legend(loc='upper left')
+    plt.grid()
 
     plt.subplots_adjust(wspace=0.3, hspace=0.5)
     plt.show()
