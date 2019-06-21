@@ -22,6 +22,8 @@ def space_to_tab(line):
 
 def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm, p_util, p_net_rx, p_net_tx, p_avg1, p_avg5, p_avg15):
     np_x = np.asarray(t)
+    X = len(t) - len(t) // 7
+
 
     #CPU
     cpu_y1 = np.asarray(cpu)
@@ -55,6 +57,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax00 = fig.add_subplot(3, 2, 1)
     ax00.plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
     ax00.plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
+    # ax00.plot([np_x[X]], [], color='red')
     ax00.set_xlabel('Продолжительность теста, ч:мм')
     ax00.set_ylabel('Утилизация CPU, %')
     ax00.set_title('Утилизация CPU')
