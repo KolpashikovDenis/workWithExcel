@@ -24,7 +24,6 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     np_x = np.asarray(t)
     X = len(t) - len(t) // 7
 
-
     #CPU
     cpu_y1 = np.asarray(cpu)
     qcpu_y2 = np.asarray(qcpu)
@@ -57,7 +56,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax00 = fig.add_subplot(3, 2, 1)
     ax00.plot(np_x, cpu_y1, color='blue', label='Утилизация CPU')
     ax00.plot(np_x, qcpu_y2, color='green', label='Очередь CPU')
-    # ax00.plot([np_x[X]], [], color='red')
+    ax00.axvline(x=np_x[-1], color = 'red')
     ax00.set_xlabel('Продолжительность теста, ч:мм')
     ax00.set_ylabel('Утилизация CPU, %')
     ax00.set_title('Утилизация CPU')
@@ -69,12 +68,14 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     sub_ax00.plot([], [])
     sub_ax00.set_ylabel('Очереди CPU, шт')
     sub_ax00.set_ylim(ylim[0], ylim[1])
+    sub_ax00.tick_params(labelsize=6, labelrotation=90)
     plt.grid()
 
     # Утилизация памяти и файла подкачки
     ax01=fig.add_subplot(3, 2, 2)
     ax01.plot(np_x, memsused_y, color='blue', label='Утилизация памяти')
     ax01.plot([], [], color='green', label='Утилизация подкачки')
+    ax01.axvline(x=np_x[-1], color='red')
     ax01.set_xlabel('Продолжительность теста, ч:мм')
     ax01.set_ylabel('Утилизация памяти, %')
     ax01.set_title('Утилизация памяти')
@@ -92,8 +93,9 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     # очередь дисковой подсистемы
     ax10=fig.add_subplot(3, 2, 3)
     ax10.plot(np_x, avgqu_sz_y, color='blue', label='Очередь дисковой подсистемы')
+    ax10.axvline(x=np_x[-1], color='red')
     ax10.set_xlabel('Продолжительность теста, ч:мм')
-    ax10.set_ylabel('Очередь дисковой подсистемы, шт')
+    ax10.set_ylabel('Очередь дисковой\nподсистемы, шт')
     ax10.set_title('Очередь дисковой подсистемы')
     ax10.xaxis.set_major_locator(ticker.MultipleLocator(5))
     ax10.tick_params(labelsize=6, labelrotation=90)
@@ -105,6 +107,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax11.plot(np_x, avg1_y, color='blue', label='за 1 минуту')
     ax11.plot(np_x, avg5_y, color='green', label='за 5 минут')
     ax11.plot(np_x, avg15_y, color='purple', label='за 15 минут')
+    ax11.axvline(x=np_x[-1], color='red')
     ax11.set_xlabel('Продолжительность теста, ч:мм')
     ax11.set_ylabel('Значение коэффициента')
     ax11.set_title('Load Average')
@@ -117,6 +120,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax20=fig.add_subplot(3, 2, 5)
     ax20.plot(np_x, await_y, color='blue', label='среднее время выполнения чтения/записи')
     ax20.plot(np_x, svctm_y, color='green', label='среднее время обслуживания чтения/записи')
+    ax20.axvline(x=np_x[-1], color='red')
     ax20.set_xlabel('Продолжительность теста, ч:мм')
     ax20.set_ylabel('Среднее время\nчтения/записи')
     ax20.set_title('Среднее время чтения/записи')
@@ -129,6 +133,7 @@ def show_graphs(t, cpu, qcpu, p_memused, p_swpused, p_avgqu_sz, p_await, p_svctm
     ax21=fig.add_subplot(3, 2, 6)
     ax21.plot(np_x, net_rx_y, color='blue', label='Получаемые данные')
     ax21.plot(np_x, net_tx_y, color='green', label='Передаваемые данные')
+    ax21.axvline(x=np_x[-1], color='red')
     ax21.set_xlabel('Продолжительность теста, ч:мм')
     ax21.set_ylabel('Передаваемые данные')
     ax21.set_title('Утилизация сетевого интерфейса')
@@ -200,16 +205,16 @@ line = str('')
 
 # Данные для CPU
 with open(f_name_with_data, 'r') as infile:
-    active_sheet = wb_report[Items[1]]
+    # active_sheet = wb_report[Items[1]]
     # Утилизация CPU, idle в %
     while True:
         line = infile.readline().strip()
         if '%idle' in line:
-            data = space_to_tab(line).split('\t')
-            del data[1:10]
-            data[0] = data[0][:5]
-            active_sheet.cell(row=1, column=1).value = data[0]
-            active_sheet.cell(row=1, column=2).value = data[1]
+            # data = space_to_tab(line).split('\t')
+            # del data[1:10]
+            # data[0] = data[0][:5]
+            # active_sheet.cell(row=1, column=1).value = data[0]
+            # active_sheet.cell(row=1, column=2).value = data[1]
             break
 
     r = 2
@@ -221,10 +226,10 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:10]
             data[0] = data[0][:5]
-            active_sheet.cell(row=r, column=1).value = data[0]
+            # active_sheet.cell(row=r, column=1).value = data[0]
             t.append(data[0])
             a = 100.0 - float(data[1].replace(',', '.'))
-            active_sheet.cell(row=r, column=2).value = a
+            # active_sheet.cell(row=r, column=2).value = a
             cpu.append(a)
             r += 1
 
@@ -232,9 +237,9 @@ with open(f_name_with_data, 'r') as infile:
     while True:
         line = infile.readline().strip()
         if 'runq-sz' in line:
-            data = space_to_tab(line).split('\t')
-            del data[2:]
-            active_sheet.cell(row=1, column=3).value = data[1]
+            # data = space_to_tab(line).split('\t')
+            # del data[2:]
+            # active_sheet.cell(row=1, column=3).value = data[1]
             break
 
     r = 2
@@ -245,22 +250,22 @@ with open(f_name_with_data, 'r') as infile:
         data = space_to_tab(line).split('\t')
         del data[2:]
         a = float(data[1].replace(',', '.'))
-        active_sheet.cell(row=r, column=3).value = a
+        # active_sheet.cell(row=r, column=3).value = a
         q_cpu.append(a)
         r += 1
 
 # Данные для МЕМ
 with open(f_name_with_data, 'r') as infile:
-    active_sheet = wb_report[Items[2]]
+    # active_sheet = wb_report[Items[2]]
     while True:
         line = infile.readline().strip()
         if 'memused' in line:
-            data = space_to_tab(line).split('\t')
-            del data[1:3]
-            del data[2:]
-            data[0] = data[0][:5]
-            active_sheet.cell(row=1, column=1).value = data[0]
-            active_sheet.cell(row=1, column=2).value = data[1]
+            # data = space_to_tab(line).split('\t')
+            # del data[1:3]
+            # del data[2:]
+            # data[0] = data[0][:5]
+            # active_sheet.cell(row=1, column=1).value = data[0]
+            # active_sheet.cell(row=1, column=2).value = data[1]
             break
 
     r = 2
@@ -272,9 +277,9 @@ with open(f_name_with_data, 'r') as infile:
         del data[1:3]
         del data[2:]
         data[0] = data[0][:5]
-        active_sheet.cell(row=r, column=1).value = data[0]
+        # active_sheet.cell(row=r, column=1).value = data[0]
         a = float(data[1].replace(',', '.'))
-        active_sheet.cell(row=r, column=2).value = a
+        # active_sheet.cell(row=r, column=2).value = a
         memsused.append(a)
         r += 1
 
@@ -284,7 +289,7 @@ with open(f_name_with_data, 'r') as infile:
             data = space_to_tab(line).split('\t')
             del data[1:3]
             del data[2:]
-            active_sheet.cell(row=1, column=3).value = data[1]
+            # active_sheet.cell(row=1, column=3).value = data[1]
             break
 
     r = 2
@@ -296,7 +301,7 @@ with open(f_name_with_data, 'r') as infile:
         del data[1:3]
         del data[2:]
         a = float(data[1].replace(',', '.'))
-        active_sheet.cell(row=r, column=3).value = a
+        # active_sheet.cell(row=r, column=3).value = a
         swpused.append(a)
         r += 1
 
@@ -306,14 +311,14 @@ with open(f_name_with_data, 'r') as infile:
     while True:
         line = infile.readline().strip()
         if 'DEV' in line:
-            data = space_to_tab(line).split('\t')
-            del data[1:6]
-            data[0] = data[0][:5]
-            active_sheet.cell(row=1, column=1).value = data[0]
-            active_sheet.cell(row=1, column=2).value = data[1]
-            active_sheet.cell(row=1, column=3).value = data[2]
-            active_sheet.cell(row=1, column=4).value = data[3]
-            active_sheet.cell(row=1, column=5).value = data[4]
+            # data = space_to_tab(line).split('\t')
+            # del data[1:6]
+            # data[0] = data[0][:5]
+            # active_sheet.cell(row=1, column=1).value = data[0]
+            # active_sheet.cell(row=1, column=2).value = data[1]
+            # active_sheet.cell(row=1, column=3).value = data[2]
+            # active_sheet.cell(row=1, column=4).value = data[3]
+            # active_sheet.cell(row=1, column=5).value = data[4]
             break
 
     # САМЫЙ ЖОПОШНЫЙ УЧАСТОК КОДА
@@ -352,11 +357,11 @@ with open(f_name_with_data, 'r') as infile:
         l_util.append(_util / size)
 
         avg_map[key] = [_avgqu_sz / size, _await / size, _svctm / size, _util / size]
-        active_sheet.cell(row=rowNum, column=1).value = key
-        active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
-        active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
-        active_sheet.cell(row=rowNum, column=4).value = avg_map[key][2]
-        active_sheet.cell(row=rowNum, column=5).value = avg_map[key][3]
+        # active_sheet.cell(row=rowNum, column=1).value = key
+        # active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
+        # active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
+        # active_sheet.cell(row=rowNum, column=4).value = avg_map[key][2]
+        # active_sheet.cell(row=rowNum, column=5).value = avg_map[key][3]
         rowNum += 1
 
 # Усредненные данные по сетевым интерфейсам
@@ -365,13 +370,13 @@ with open(f_name_with_data, 'r') as infile:
     while True:
         line = infile.readline().strip()
         if 'IFACE' in line:
-            data = space_to_tab(line).split('\t')
-            del data[1:4]
-            del data[3:]
-            data[0] = data[0][:5]
-            active_sheet.cell(row=1, column=1).value = data[0]
-            active_sheet.cell(row=1, column=2).value = data[1]
-            active_sheet.cell(row=1, column=3).value = data[2]
+            # data = space_to_tab(line).split('\t')
+            # del data[1:4]
+            # del data[3:]
+            # data[0] = data[0][:5]
+            # active_sheet.cell(row=1, column=1).value = data[0]
+            # active_sheet.cell(row=1, column=2).value = data[1]
+            # active_sheet.cell(row=1, column=3).value = data[2]
             break
 
     map = {}
@@ -404,9 +409,9 @@ with open(f_name_with_data, 'r') as infile:
         net_tx.append(txkB / size)
 
         avg_map[key] = [rxkB / size, txkB / size]
-        active_sheet.cell(row=rowNum, column=1).value = key
-        active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
-        active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
+        # active_sheet.cell(row=rowNum, column=1).value = key
+        # active_sheet.cell(row=rowNum, column=2).value = avg_map[key][0]
+        # active_sheet.cell(row=rowNum, column=3).value = avg_map[key][1]
         rowNum += 1
 
 # Динамика Load Average
@@ -415,13 +420,13 @@ with open(f_name_with_data, 'r') as infile:
     while True:
         line = infile.readline().strip()
         if 'runq-sz' in line:
-            data = space_to_tab(line).split('\t')
-            del data[1:3]
-            data[0] = data[0][:5]
-            active_sheet.cell(row=1, column=1).value = data[0]
-            active_sheet.cell(row=1, column=2).value = data[1]
-            active_sheet.cell(row=1, column=3).value = data[2]
-            active_sheet.cell(row=1, column=4).value = data[3]
+            # data = space_to_tab(line).split('\t')
+            # del data[1:3]
+            # data[0] = data[0][:5]
+            # active_sheet.cell(row=1, column=1).value = data[0]
+            # active_sheet.cell(row=1, column=2).value = data[1]
+            # active_sheet.cell(row=1, column=3).value = data[2]
+            # active_sheet.cell(row=1, column=4).value = data[3]
             break
 
     r = 2
@@ -433,18 +438,16 @@ with open(f_name_with_data, 'r') as infile:
         del data[1:3]
         data[0] = data[0][:5]
 
-        active_sheet.cell(row=r, column=1).value = data[0]
-        active_sheet.cell(row=r, column=2).value = float(data[1].replace(',', '.'))
-        active_sheet.cell(row=r, column=3).value = float(data[2].replace(',', '.'))
-        active_sheet.cell(row=r, column=4).value = float(data[3].replace(',', '.'))
+        # active_sheet.cell(row=r, column=1).value = data[0]
+        # active_sheet.cell(row=r, column=2).value = float(data[1].replace(',', '.'))
+        # active_sheet.cell(row=r, column=3).value = float(data[2].replace(',', '.'))
+        # active_sheet.cell(row=r, column=4).value = float(data[3].replace(',', '.'))
         ld_avg_1.append(float(data[1].replace(',', '.')))
         ld_avg_5.append(float(data[2].replace(',', '.')))
         ld_avg_15.append(float(data[3].replace(',', '.')))
         r += 1
 
-# Рисуем график 'Утилизация CPU' и 'Очереди CPU'
+# Рисуем все графики оптом!
 show_graphs(t, cpu, q_cpu, memsused, swpused, l_avgqu_sz, l_await, l_svctm, l_util, net_rx, net_tx, ld_avg_1, ld_avg_5, ld_avg_15)
 
-wb_report.save(f_name_report)
-
-# Начинаем рисовать
+# wb_report.save(f_name_report)
